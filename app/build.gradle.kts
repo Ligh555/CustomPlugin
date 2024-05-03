@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("com.ligh.viewBind")
 }
 
 android {
@@ -36,6 +37,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -46,6 +51,8 @@ dependencies {
     val material = "1.10.0"
     val activity = "1.8.0"
     val constraintlayout = "2.1.4"
+
+    implementation(project(":testaar"))
 
 
     implementation("androidx.activity:activity:$activity")

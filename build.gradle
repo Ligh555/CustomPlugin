@@ -2,8 +2,6 @@
 
 buildscript {
     repositories {
-        google()
-        jcenter()
         maven {
             setUrl("https://maven.aliyun.com/repository/google")
         }
@@ -20,6 +18,10 @@ buildscript {
             setUrl(file("D:/code/git/lancet/repos"))
         }
         maven { setUrl ("https://jitpack.io") }
+
+        google()
+        jcenter()
+
         
     }
     dependencies {
@@ -34,8 +36,6 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        jcenter()
         maven {
             setUrl("https://maven.aliyun.com/repository/google")
         }
@@ -49,6 +49,9 @@ allprojects {
             setUrl("https://maven.aliyun.com/repository/gradle-plugin")
         }
         maven { url "https://jitpack.io" }
+        google()
+        jcenter()
+
         
     }
 }
