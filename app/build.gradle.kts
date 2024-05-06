@@ -62,3 +62,14 @@ dependencies {
     implementation("com.google.android.material:material:$material")
 
 }
+task("ceshi"){
+    println("ceshi")
+    doLast{
+        println("ceshi1")
+    }
+
+//    tasks.getByName("assemble").dependsOn(tasks.getByName("hello"))
+
+}
+
+//tasks.getByName("processDebugManifest")?.dependsOn(tasks.getByName("hello"))
