@@ -15,12 +15,15 @@ import org.gradle.api.Project
 import java.io.File
 
 class MyPlugin : Plugin<Project> {
+
+
+    var aarList = mutableListOf("test")
     override fun apply(target: Project) {
         target.afterEvaluate {
             val task = target.tasks.register("insetLfayout") {
                 doLast {
                     println("insetLfayout excution")
-                    val bundle = creatLayoutFileBundle()
+                    val bundles = createLayoutFileBundle(target)
                     val writer = object : JavaFileWriter() {
                         // These methods are not supposed to be used, they are here only because
                         // the superclass requires an implementation of it.
@@ -39,12 +42,13 @@ class MyPlugin : Plugin<Project> {
                         }
                     }
                     val xmlOutDir = "D:\\code\\git\\CustomPlugin\\app\\build\\intermediates\\data_binding_layout_info_type_merge\\debug\\out"
-
-                    writer.writeToFile(File(xmlOutDir, bundle.fileName +"-"+ bundle.directory+".xml"), bundle.toXML())
-
+                    bundles.forEach { bundle ->
+                        writer.writeToFile(File(xmlOutDir, bundle.fileName +"-"+ bundle.directory+".xml"), bundle.toXML())
+                    }
                 }
             }
             println("in configuration")
+            Utils.getConfiguration(project)
             target.tasks.findByName("processDebugMainManifest")?.finalizedBy(task)
 
             val task1 = target.tasks.register("customCreateViewBinding") {
@@ -54,53 +58,56 @@ class MyPlugin : Plugin<Project> {
                 }
             }
             target.tasks.findByName("dataBindingGenBaseClassesDebug")?.finalizedBy(task1)
-
-            printDependices(target)
         }
     }
 
-    private fun creatLayoutFileBundle(): ResourceBundle.LayoutFileBundle {
-        val path =
-            "D:\\code\\git\\CustomPlugin\\app\\build\\intermediates\\data_binding_layout_info_type_package\\debug\\out\\activity_main-layout.xml"
-        println("qwe")
 
-        val input = File("D:\\code\\git\\Router\\test\\src\\main\\res\\layout\\test.xml")
-        val dirFile = File("D:\\code\\git\\Router\\test")
+    private fun collectLayoutFile(project: Project): List<File> {
+        val aarFile = Utils.getConfiguration(project).files.find { file ->
+            file.name.contains("test")
+        }
 
-//        val input = File("D:\\code\\git\\CustomPlugin\\app\\src\\main\\res\\layout\\activity_main.xml")
-//        val dirFile = File("D:\\code\\git\\CustomPlugin")
+        return aarFile?.let {
+            project.zipTree(aarFile).files.toList().filter { it.absolutePath.contains("res\\layout") }
+        } ?: emptyList()
+    }
+
+    private fun createLayoutFileBundle(project: Project): List<ResourceBundle.LayoutFileBundle> {
         val outFile =
             File("D:\\code\\git\\CustomPlugin\\app\\build\\intermediates\\incremental\\debug\\ligh\\layout")
-        val bulder = LayoutFileParser.parseXml(
-            RelativizableFile.fromAbsoluteFile(input, dirFile),
-            outFile,
-            "com.ligh.customplugin",
-            CustomLoomUp(),
-            true,
-            false
-        )
-
-        val testString =
-            "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?><Layout layout=\"test\" modulePackage=\"com.ligh.customplugin\" filePath=\"src\\main\\res\\layout\\test.xml\" directory=\"layout\" isMerge=\"false\" isBindingData=\"false\" rootNodeType=\"android.widget.LinearLayout\"><Targets><Target tag=\"layout/test_0\" view=\"LinearLayout\"><Expressions/><location startLine=\"1\" startOffset=\"0\" endLine=\"12\" endOffset=\"14\"/></Target></Targets></Layout>"
-        println(bulder.toXML())
-        return bulder
+        return collectLayoutFile(project).map {
+            LayoutFileParser.parseXml(
+                RelativizableFile.fromAbsoluteFile(it, it.parentFile),
+                outFile,
+                "com.ligh.customplugin",
+                CustomLoomUp(),
+                true,
+                false
+            )
+        }
     }
 
-    private fun printDependices(project: Project) {
-        val configurations = project.configurations
-        val compileConfig = configurations.getByName("implementation")
-        compileConfig.isCanBeResolved = true
-        compileConfig.dependencies.forEach { println(it) }
-
-    }
 
     fun genertR(str1: String, str2: String): String {
         return "com.ligh.test"
     }
 
     private fun customCreatBinding() {
-        val bundle = creatLayoutFileBundle()
-        val layoutModel = BaseLayoutModel(listOf(bundle), ::genertR)
+
+        val path = "D:\\code\\git\\CustomPlugin\\app\\build\\intermediates\\incremental\\debug\\ligh\\layout"
+        var mBundles = mutableListOf<ResourceBundle.LayoutFileBundle>()
+        val directory = File(path)
+
+        if (directory.exists() && directory.isDirectory) {
+            directory.walk().forEach {
+                if (it.isFile) {
+                    val bundle = ResourceBundle.LayoutFileBundle.fromXML(it.inputStream())
+                    mBundles.add(bundle)
+                }
+            }
+        }
+
+        val layoutModel = BaseLayoutModel(mBundles, ::genertR)
         val isDataBinding = false
         val javaFile: JavaFile
         if (isDataBinding) {
