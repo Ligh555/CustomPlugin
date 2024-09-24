@@ -8,6 +8,8 @@ android {
     namespace = "com.ligh.customplugin"
     compileSdk = 34
 
+    resourcePrefix="app_"
+
     defaultConfig {
         applicationId = "com.ligh.customplugin"
         minSdk = 24

@@ -51,5 +51,9 @@ dependencies{
     implementation(gradleApi())
     implementation(localGroovy())
     implementation("com.android.tools.build:gradle:8.1.1")
+    implementation("org.ow2.asm:asm:9.3")
+    implementation("org.ow2.asm:asm-util:9.3")
+    implementation("org.ow2.asm:asm-commons:9.3")
+
 }
 
