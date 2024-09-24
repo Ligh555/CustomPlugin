@@ -13,8 +13,7 @@ plugins {
 
 //使用 kotlin-dsl / org.jetbrains.kotlin.jvm 的时候，需要mavenCentral仓库
 repositories {
-    google()
-    mavenCentral()
+    mavenLocal()
     maven {
         setUrl("https://maven.aliyun.com/repository/google")
     }
@@ -30,6 +29,8 @@ repositories {
     maven {
         setUrl("https://jitpack.io")
     }
+    google()
+    mavenCentral()
 
 }
 
