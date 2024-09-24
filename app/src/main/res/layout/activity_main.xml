@@ -11,6 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/ic_launcher_background"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@drawable/ic_launcher_background_test"/>
         <include
             android:id="@+id/local"
             layout="@layout/local_test" />

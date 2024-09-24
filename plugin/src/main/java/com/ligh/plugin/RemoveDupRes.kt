@@ -12,12 +12,13 @@ object RemoveDupRes {
 
     fun optimize(resourcePath: String) {
         // 1. 遍历 res 目录下的图片，根据 md5 寻找重复图片，并记录在 map 中，map 的 key 为 md5，value 为图片数据
-        val duplicatedResources: HashMap<String, ArrayList<DuplicatedEntry>> = findDuplicatedResources(resourcePath)
+        val duplicatedResources = mutableMapOf<String, MutableList<DuplicatedEntry>>()
+            findDuplicatedResources(resourcePath,duplicatedResources)
         val arscFile = File("$resourcePath/resources.arsc")
 
         if (arscFile.exists()) {
             var arscStream: FileInputStream? = null
-            var resourceFile: ResourceFile?
+            val resourceFile: ResourceFile
 
             try {
                 arscStream = FileInputStream(arscFile)
@@ -35,23 +36,25 @@ object RemoveDupRes {
                     // 保留第一个资源，从索引1开始，其他资源删除掉
                     for (index in 1 until duplicatedEntryList.size) {
                         // 删除图片，并将删除的图片信息保存在 toBeReplacedResourceMap 中
-                        removeZipEntry(apFile, duplicatedEntryList[index].name)
-                        toBeReplacedResourceMap[duplicatedEntryList[index].name] = duplicatedEntryList[0].name
+                        val entry = duplicatedEntryList[index]
+                        removeZipEntry(entry)
+                        toBeReplacedResourceMap[entry.name] =
+                            duplicatedEntryList[0].name
                     }
                 }
 
                 // 3. 更新 resources.arsc 中的数据
                 for (chunk in chunks) {
                     if (chunk is ResourceTableChunk) {
-                        val resourceTableChunk = chunk
                         // 3. 找到字符串常量池，调用 getStringPool 方法，StringPoolChunk 是 android-chunk-utils 中定义的
-                        val stringPoolChunk = resourceTableChunk.stringPool
+                        val stringPoolChunk = chunk.stringPool
                         for (i in 0 until stringPoolChunk.stringCount) {
                             // 遍历字符串常量池的值，如果与 toBeReplacedResourceMap 中包含的值相等，则进行替换
                             val key = stringPoolChunk.getString(i)
                             if (toBeReplacedResourceMap.containsKey(key)) {
                                 toBeReplacedResourceMap[key]?.let {
-                                    stringPoolChunk.setString(i,
+                                    stringPoolChunk.setString(
+                                        i,
                                         it
                                     )
                                 }
@@ -71,12 +74,28 @@ object RemoveDupRes {
         }
     }
 
-    fun findDuplicatedResources(resourcePath: String): HashMap<String, ArrayList<DuplicatedEntry>> {
-        // 返回重复图片的逻辑实现
-        return HashMap()
+    private fun findDuplicatedResources(
+        resourcePath: String,
+        duplicatedResources: MutableMap<String, MutableList<DuplicatedEntry>>
+    ) {
+        val file = File(resourcePath)
+        if (file.isDirectory) {
+            file.listFiles()?.forEach {
+                findDuplicatedResources(it.absolutePath, duplicatedResources)
+            }
+        } else {
+            //判断是值类型资源还是文件资源
+            if (file.parentFile.name != "values" && !file.parentFile.name.startsWith("values-")) {
+                val md5 = MD5Util.getMD5(file)
+                val list = duplicatedResources[md5] ?: mutableListOf()
+                list.add(DuplicatedEntry(file.name, resourcePath))
+                duplicatedResources[md5] = list
+            }
+
+        }
     }
 
-    fun removeZipEntry(apFile: File, entryName: String) {
+    private fun removeZipEntry(entry: DuplicatedEntry) {
         // 删除 zip 中的 entry 实现
     }
 

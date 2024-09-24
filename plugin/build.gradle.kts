@@ -29,7 +29,7 @@ gradlePlugin {
     plugins {
         create("res") {
             id = "com.ligh.res"
-            implementationClass = "com.ligh.plugin.MyPlugin"
+            implementationClass = "com.ligh.plugin.ResPlugin"
         }
     }
 }
@@ -46,7 +46,7 @@ publishing {
         register<MavenPublication>("publish") {
             groupId = "com.ligh.res"
             artifactId = "res"
-            version = "2.0.0-SNAPSHOT"
+            version = "3.0.0-SNAPSHOT"
 
             from(components["java"])
         }
