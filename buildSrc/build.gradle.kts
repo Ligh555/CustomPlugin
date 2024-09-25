@@ -43,7 +43,7 @@ gradlePlugin {
             //Groovy插件主类
             //implementationClass = "com.heiko.buildsrc.MyPluginGroovy"
             //Kotlin插件主类
-            implementationClass = "com.ligh.plugin.ResPlugin"
+            implementationClass = "com.ligh.plugin.ResCompressPlugin"
         }
     }
 }

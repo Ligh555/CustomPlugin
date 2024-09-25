@@ -19,8 +19,8 @@ class ResPlugin : Plugin<Project> {
         project.afterEvaluate {
             variants.forEach { variant ->
                 val variantName = variant.name.capitalize()
-                val processResource = project.tasks.getByName("process${variantName}Resources")
-                processResource.doLast {
+                val processResource = project.tasks.getByName("package${variantName}")
+                processResource.doFirst {
                     // 获取资源打包输出的文件夹，
                     variant.allRawAndroidResources.files.forEach { file ->
                         // 3. 找到 .ap_ 文件

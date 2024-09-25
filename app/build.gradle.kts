@@ -1,9 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("ApkMonitorPlugin")
-//    id("com.ligh.viewBind")
-//    id("com.ligh.res")
+    id("com.ligh.viewBind")
 }
 
 android {
@@ -25,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
