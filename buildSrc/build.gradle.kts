@@ -43,7 +43,7 @@ gradlePlugin {
             //Groovy插件主类
             //implementationClass = "com.heiko.buildsrc.MyPluginGroovy"
             //Kotlin插件主类
-            implementationClass = "com.ligh.MyPlugin"
+            implementationClass = "com.ligh.plugin.ResPlugin"
         }
     }
 }
@@ -52,5 +52,6 @@ dependencies{
     implementation(gradleApi())
     implementation(localGroovy())
     implementation("com.android.tools.build:gradle:8.1.1")
+    implementation("pink.madis.apk.arsc:android-chunk-utils:0.0.7")
 }
 
